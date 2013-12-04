@@ -1,0 +1,6 @@
+[submodule "jogamp/gluegen"]
+	path = jogamp/gluegen
+	url = git://jogamp.org/srv/scm/gluegen.git
+[submodule "jogamp/jogl"]
+	path = jogamp/jogl
+	url = git://jogamp.org/srv/scm/jogl.git
