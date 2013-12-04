@@ -1,8 +1,13 @@
 package sampleui;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -15,6 +20,19 @@ public class App implements SelectionListener{
 	private JLabel status = null;
 	private FileFilter filter;
 	private Mesh mesh = null;
+	
+	private Point optPos = new Point(0, 0);
+	
+	private class MeshColor{
+		MeshColor(String s, Color c){
+			name = s;
+			color = c;
+		}
+		public String name;
+		public Color color;
+	}
+	
+	private MeshColor[] mesh_colors;
 	
 	public App()
 	{
@@ -35,6 +53,13 @@ public class App implements SelectionListener{
 				return false;
 			}
 		};
+		
+		mesh_colors = new MeshColor[4];
+		
+		mesh_colors[0] = new MeshColor("edge", Color.blue);
+		mesh_colors[1] = new MeshColor("unconnected edge", Color.red);
+		mesh_colors[2] = new MeshColor("face", Color.gray);
+		mesh_colors[3] = new MeshColor("peat_face", Color.green);
 	}
 	
 	private JToolBar createToolBar()
@@ -143,7 +168,53 @@ public class App implements SelectionListener{
 	
 	private void showOptions(ActionEvent e)
 	{
-		JFrame opt;
+		final JDialog opt = new JDialog(frame, "woa options");
+		final JPanel colors = new JPanel(new GridLayout(mesh_colors.length, 2));
+		
+		JButton buttonOk = new JButton("ok");
+		buttonOk.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				Component[] comps = colors.getComponents();
+				for(Component comp : comps){
+					if(comp instanceof JButton){
+						Color color = comp.getForeground();
+					}
+				}
+				optPos = opt.getLocation();
+				opt.setVisible(false);
+			}
+		});
+		JButton buttonCancel = new JButton("cancel");
+		buttonCancel.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				optPos = opt.getLocation();
+				opt.setVisible(false);
+			}
+		});
+				
+		JPanel pane = new JPanel();
+		pane.add(buttonOk);
+		pane.add(buttonCancel);
+
+		for(final MeshColor c : mesh_colors){
+			final JButton button = new JButton("\u25A0 change");
+			button.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					Color newcolor = JColorChooser.showDialog(opt, c.name, button.getForeground());
+					button.setForeground(newcolor);
+				}
+			});
+			button.setForeground(c.color);
+			colors.add(new JLabel(c.name));
+			colors.add(button);
+		}
+		
+		opt.setLayout(new BorderLayout());
+		opt.add(pane, BorderLayout.PAGE_END);
+		opt.add(colors, BorderLayout.CENTER);
+		opt.pack();
+		opt.setLocation(optPos);
+		opt.setVisible(true);
 	}
 
 	@Override
